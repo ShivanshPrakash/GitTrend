@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">GitTrend</string>
     <string name="text_trending">Trending</string>
+    <string name="retry">Retry</string>
+    <string name="no_internet_description">An alien is probably blocking your signal.</string>
+    <string name="no_internet_message">Something went wrong...</string>
 </resources>
