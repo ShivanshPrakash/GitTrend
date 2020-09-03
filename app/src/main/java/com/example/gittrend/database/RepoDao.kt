@@ -18,5 +18,5 @@ interface RepoDao {
     suspend fun clearDatabase()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRepository(product: Repository)
+    suspend fun insertRepository(repository: Repository)
 }
