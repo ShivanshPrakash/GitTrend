@@ -13,9 +13,9 @@ data class Repository(
     @ColumnInfo(name = "author") val author: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "description") val description: String,
-    @ColumnInfo(name = "language") val language: String,
-    @ColumnInfo(name = "language_color") val languageColor: String,
-    @ColumnInfo(name = "avatar") val avatarUrl: String,
+    @ColumnInfo(name = "language") val language: String?,
+    @ColumnInfo(name = "language_color") val languageColor: String?,
+    @ColumnInfo(name = "avatar") val avatarUrl: String?,
     @ColumnInfo(name = "stars") val stars: Int,
     @ColumnInfo(name = "forks") val forks: Int
 )
