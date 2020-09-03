@@ -9,6 +9,8 @@ import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ethanhua.skeleton.RecyclerViewSkeletonScreen
+import com.ethanhua.skeleton.Skeleton
 import com.example.gittrend.database.Repository
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,21 +23,38 @@ class MainActivity : AppCompatActivity() {
     private lateinit var repoAdapter: RepoAdapter
     private lateinit var repoRecyclerView: RecyclerView
     private lateinit var layoutNoInternet: ConstraintLayout
+    private lateinit var skeletonScreen: RecyclerViewSkeletonScreen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        layoutNoInternet = findViewById(R.id.layout_no_internet)
-        findViewById<Button>(R.id.button_retry).setOnClickListener { appViewModel.refreshFromApi() }
+        setNoInternetLayout()
+        setUpRecyclerView()
 
+        skeletonScreen = Skeleton.bind(repoRecyclerView)
+            .adapter(repoAdapter)
+            .load(R.layout.layout_skeleton).show()
+
+        attachObservers()
+    }
+
+    private fun setNoInternetLayout() {
+        layoutNoInternet = findViewById(R.id.layout_no_internet)
+        findViewById<Button>(R.id.button_retry).setOnClickListener {
+            skeletonScreen.show()
+            repoRecyclerView.visibility = View.VISIBLE
+            layoutNoInternet.visibility = View.GONE
+            appViewModel.refreshFromApi()
+        }
+    }
+
+    private fun setUpRecyclerView() {
         repoRecyclerView = findViewById(R.id.repo_recycler_view)
         repoRecyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         repoAdapter = RepoAdapter(repoList)
         repoRecyclerView.adapter = repoAdapter
-
-        attachObservers()
     }
 
     private fun attachObservers() {
@@ -48,11 +67,13 @@ class MainActivity : AppCompatActivity() {
                 repoList.clear()
                 repoList.addAll(newRepoList)
                 if (this::repoAdapter.isInitialized) repoAdapter.notifyDataSetChanged()
+                skeletonScreen.hide()
             }
         }
 
         appViewModel.noInternetLiveData.observe(this) { noInternet ->
             if (noInternet) {
+                skeletonScreen.hide()
                 repoRecyclerView.visibility = View.GONE
                 layoutNoInternet.visibility = View.VISIBLE
                 appViewModel.noInternetLiveData.value = false
