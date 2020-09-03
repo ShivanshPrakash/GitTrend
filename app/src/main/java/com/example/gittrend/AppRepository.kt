@@ -12,5 +12,12 @@ class AppRepository(
     private val localSource: LocalDataSource,
     private val appContext: Context
 ) {
-    suspend fun getRepoListFromApi() = remoteSource.getRepositories()
+
+    fun getRepoListLiveData() = localSource.getCartListLiveData()
+
+    suspend fun refreshDatabaseFromApi() {
+        val repositoryList = remoteSource.getRepositories()
+        localSource.clearDatabase()
+        localSource.addReposToDatabase(repositoryList)
+    }
 }

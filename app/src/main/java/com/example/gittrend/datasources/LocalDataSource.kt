@@ -11,8 +11,8 @@ import kotlinx.coroutines.withContext
 class LocalDataSource(private val repoDao: RepoDao) {
     fun getCartListLiveData() = repoDao.getRepoLiveData()
 
-    suspend fun addRepoToDatabase(repository: Repository) = withContext(Dispatchers.IO) {
-        repoDao.insertRepository(repository)
+    suspend fun addReposToDatabase(repositoryList: List<Repository>) = withContext(Dispatchers.IO) {
+        repoDao.insertRepositories(repositoryList)
     }
 
     suspend fun clearDatabase() = withContext(Dispatchers.IO) { repoDao.clearDatabase() }

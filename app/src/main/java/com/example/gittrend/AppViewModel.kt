@@ -10,5 +10,8 @@ import kotlinx.coroutines.launch
  */
 class AppViewModel @ViewModelInject constructor(private val appRepository: AppRepository) :
     ViewModel() {
-    fun refreshFromApi() = viewModelScope.launch { appRepository.getRepoListFromApi() }
+
+    val repoListLiveData = appRepository.getRepoListLiveData()
+
+    fun refreshFromApi() = viewModelScope.launch { appRepository.refreshDatabaseFromApi() }
 }
