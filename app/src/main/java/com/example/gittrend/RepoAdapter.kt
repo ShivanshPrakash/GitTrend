@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
@@ -51,11 +52,26 @@ class RepoAdapter(private val repositoryList: List<Repository>) :
         val avatar: ImageView = itemView.findViewById(R.id.image_avatar)
         val authorName: TextView = itemView.findViewById(R.id.text_author)
         val repoName: TextView = itemView.findViewById(R.id.text_repo_name)
+        private val extraContent: ConstraintLayout = itemView.findViewById(R.id.extra_contents)
 
         val description: TextView = itemView.findViewById(R.id.text_description)
         val langColorIndicator: View = itemView.findViewById(R.id.language_color)
         val language: TextView = itemView.findViewById(R.id.text_language)
         val stars: TextView = itemView.findViewById(R.id.text_stars)
         val forks: TextView = itemView.findViewById(R.id.text_forks)
+
+        init {
+            itemView.setOnClickListener { view ->
+                if (extraContent.visibility == View.GONE) {
+                    extraContent.visibility = View.VISIBLE
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+                        view.elevation = 5F
+                } else {
+                    extraContent.visibility = View.GONE
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+                        view.elevation = 0F
+                }
+            }
+        }
     }
 }
