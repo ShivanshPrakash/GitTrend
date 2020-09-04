@@ -3,5 +3,7 @@
     <string name="text_trending">Trending</string>
     <string name="retry">Retry</string>
     <string name="no_internet_description">An alien is probably blocking your signal.</string>
-    <string name="no_internet_message">Something went wrong...</string>
+    <string name="no_internet_message">Something went wrong…</string>
+    <string name="sort_by_stars">Sort by stars</string>
+    <string name="sort_by_name">Sort by name</string>
 </resources>

@@ -1,11 +1,14 @@
 package com.example.gittrend
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,11 +19,12 @@ import com.example.gittrend.database.Repository
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
     private val appViewModel by viewModels<AppViewModel>()
     private val repoList = mutableListOf<Repository>()
 
+    private lateinit var menuButton: ImageButton
     private lateinit var repoAdapter: RepoAdapter
     private lateinit var repoRecyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -31,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setupMenuButton()
         setSwipeRefreshLayout()
         setNoInternetLayout()
         setUpRecyclerView()
@@ -40,6 +45,17 @@ class MainActivity : AppCompatActivity() {
             .load(R.layout.layout_skeleton).show()
 
         attachObservers()
+    }
+
+    private fun setupMenuButton() {
+        menuButton = findViewById(R.id.button_menu)
+        menuButton.setOnClickListener {
+            PopupMenu(this, it).apply {
+                setOnMenuItemClickListener(this@MainActivity)
+                inflate(R.menu.app_menu)
+                show()
+            }
+        }
     }
 
     private fun setSwipeRefreshLayout() {
@@ -72,7 +88,10 @@ class MainActivity : AppCompatActivity() {
     private fun attachObservers() {
         appViewModel.repoListLiveData.observe(this) { newRepoList ->
             Log.d("repoCount", newRepoList.size.toString())
-            if (appViewModel.checkForEmptyDatabase && newRepoList.isEmpty()) appViewModel.refreshFromApi()
+            if (newRepoList.isEmpty()) {
+                menuButton.visibility = View.GONE
+                if (appViewModel.checkForEmptyDatabase) appViewModel.refreshFromApi()
+            }
             else if (newRepoList.isNotEmpty()) {
                 repoList.clear()
                 repoList.addAll(newRepoList)
@@ -89,13 +108,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onMenuItemClick(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.sort_by_name -> {
+                appViewModel.sortRepoListByName(repoList)
+                repoAdapter.notifyDataSetChanged()
+                true
+            }
+            R.id.sort_by_stars -> {
+                appViewModel.sortRepoListByStars(repoList)
+                repoAdapter.notifyDataSetChanged()
+                true
+            }
+            else -> false
+        }
+    }
+
+
     private fun displayContents() {
         swipeRefreshLayout.visibility = View.VISIBLE
         layoutNoInternet.visibility = View.GONE
+        menuButton.visibility = View.VISIBLE
         skeletonScreen.hide()
     }
 
     private fun displayNoInternet() {
+        menuButton.visibility = View.GONE
         swipeRefreshLayout.visibility = View.GONE
         layoutNoInternet.visibility = View.VISIBLE
         skeletonScreen.hide()

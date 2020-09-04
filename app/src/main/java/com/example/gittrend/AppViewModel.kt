@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gittrend.database.Repository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
@@ -31,4 +32,9 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
             }
         }
     }
+
+    fun sortRepoListByStars(repoList: MutableList<Repository>) = repoList.sortedWith(compareBy { it.stars }).reversed()
+
+    // lexicographic (or Alphabetical?)
+    fun sortRepoListByName(repoList: MutableList<Repository>) = repoList.sortedWith(compareBy { it.name })
 }
