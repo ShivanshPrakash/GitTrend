@@ -95,7 +95,13 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
             else if (newRepoList.isNotEmpty()) {
                 repoList.clear()
                 repoList.addAll(newRepoList)
-                if (this::repoAdapter.isInitialized) repoAdapter.notifyDataSetChanged()
+                if (this::repoAdapter.isInitialized) {
+                    appViewModel.expandedLayoutPosition?.let {
+                        repoList[it].isExpanded = true
+                        repoAdapter.expandedItemPosition = it
+                    }
+                    repoAdapter.notifyDataSetChanged()
+                }
                 displayContents()
             }
         }
@@ -108,14 +114,23 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        appViewModel.expandedLayoutPosition = repoAdapter.expandedItemPosition
+    }
+
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.sort_by_name -> {
+                repoAdapter.expandedItemPosition?.let { repoList[it].isExpanded = false }
+                repoAdapter.expandedItemPosition = null
                 appViewModel.sortRepoListByName(repoList)
                 repoAdapter.notifyDataSetChanged()
                 true
             }
             R.id.sort_by_stars -> {
+                repoAdapter.expandedItemPosition?.let { repoList[it].isExpanded = false }
+                repoAdapter.expandedItemPosition = null
                 appViewModel.sortRepoListByStars(repoList)
                 repoAdapter.notifyDataSetChanged()
                 true

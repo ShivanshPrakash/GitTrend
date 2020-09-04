@@ -18,6 +18,9 @@ import com.example.gittrend.database.Repository
  */
 class RepoAdapter(private val repositoryList: List<Repository>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    var expandedItemPosition: Int? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         RepositoryViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.layout_repo_item, parent, false)
@@ -36,23 +39,41 @@ class RepoAdapter(private val repositoryList: List<Repository>) :
 
         repoViewHolder.description.text = repository.description
         repoViewHolder.language.text = repository.language
-        if (repository.languageColor != null)
-            ((repoViewHolder.langColorIndicator.background) as GradientDrawable).setColor(
-                Color.parseColor(
-                    repository.languageColor
+
+        if (repository.languageColor != null) {
+            try {
+                ((repoViewHolder.langColorIndicator.background) as GradientDrawable).setColor(
+                    Color.parseColor(
+                        repository.languageColor
+                    )
                 )
-            )
+            } catch (ex: Exception) {
+                ((repoViewHolder.langColorIndicator.background) as GradientDrawable)
+                    .setColor(Color.parseColor("#E8E8E8"))
+            }
+        }
+
         repoViewHolder.stars.text = repository.stars.toString()
         repoViewHolder.forks.text = repository.forks.toString()
+
+        if (repository.isExpanded) {
+            repoViewHolder.extraContent.visibility = View.VISIBLE
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+                repoViewHolder.itemView.elevation = 5F
+        } else {
+            repoViewHolder.extraContent.visibility = View.GONE
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+                repoViewHolder.itemView.elevation = 0F
+        }
     }
 
     override fun getItemCount(): Int = repositoryList.size
 
-    class RepositoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class RepositoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val avatar: ImageView = itemView.findViewById(R.id.image_avatar)
         val authorName: TextView = itemView.findViewById(R.id.text_author)
         val repoName: TextView = itemView.findViewById(R.id.text_repo_name)
-        private val extraContent: ConstraintLayout = itemView.findViewById(R.id.extra_contents)
+        val extraContent: ConstraintLayout = itemView.findViewById(R.id.extra_contents)
 
         val description: TextView = itemView.findViewById(R.id.text_description)
         val langColorIndicator: View = itemView.findViewById(R.id.language_color)
@@ -61,16 +82,19 @@ class RepoAdapter(private val repositoryList: List<Repository>) :
         val forks: TextView = itemView.findViewById(R.id.text_forks)
 
         init {
-            itemView.setOnClickListener { view ->
-                if (extraContent.visibility == View.GONE) {
-                    extraContent.visibility = View.VISIBLE
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
-                        view.elevation = 5F
-                } else {
-                    extraContent.visibility = View.GONE
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
-                        view.elevation = 0F
-                }
+            itemView.setOnClickListener {
+                if (adapterPosition != -1)
+                    adapterPosition.let { currentPosition ->
+                        repositoryList[currentPosition].isExpanded = !repositoryList[currentPosition].isExpanded
+                        notifyItemChanged(currentPosition)
+                        if (currentPosition != expandedItemPosition) {
+                            expandedItemPosition?.let {
+                                repositoryList[it].isExpanded = false
+                                notifyItemChanged(it)
+                            }
+                            expandedItemPosition = currentPosition
+                        } else expandedItemPosition = null
+                    }
             }
         }
     }

@@ -20,6 +20,7 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
 
     private var pendingJob: Job? = null
     var checkForEmptyDatabase = true
+    var expandedLayoutPosition: Int? = null
 
     fun refreshFromApi() {
         pendingJob?.cancel()
@@ -36,8 +37,12 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
     fun sortRepoListByStars(repoList: MutableList<Repository>) {
         repoList.sortBy { it.stars }
         repoList.reverse()
+        expandedLayoutPosition = null
     }
 
     // lexicographic (or Alphabetical?)
-    fun sortRepoListByName(repoList: MutableList<Repository>) = repoList.sortBy { it.name }
+    fun sortRepoListByName(repoList: MutableList<Repository>) {
+        repoList.sortBy { it.name }
+        expandedLayoutPosition = null
+    }
 }
