@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 
@@ -16,14 +17,18 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
     val noInternetLiveData = MutableLiveData(false)
     val repoListLiveData = appRepository.getRepoListLiveData()
 
+    private var pendingJob: Job? = null
     var checkForEmptyDatabase = true
 
-    fun refreshFromApi() = viewModelScope.launch {
-        try {
-            appRepository.refreshDatabaseFromApi()
-        } catch (exception: Exception) {
-            if (exception is UnknownHostException)
-                noInternetLiveData.value = true
+    fun refreshFromApi() {
+        pendingJob?.cancel()
+        pendingJob = viewModelScope.launch {
+            try {
+                appRepository.refreshDatabaseFromApi()
+            } catch (exception: Exception) {
+                if (exception is UnknownHostException)
+                    noInternetLiveData.value = true
+            }
         }
     }
 }
