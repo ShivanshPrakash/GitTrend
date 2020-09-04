@@ -1,7 +1,6 @@
 package com.example.gittrend
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +15,8 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
 
     val noInternetLiveData = MutableLiveData(false)
     val repoListLiveData = appRepository.getRepoListLiveData()
+
+    var checkForEmptyDatabase = true
 
     fun refreshFromApi() = viewModelScope.launch {
         try {

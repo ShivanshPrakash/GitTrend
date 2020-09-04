@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen
 import com.ethanhua.skeleton.Skeleton
 import com.example.gittrend.database.Repository
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var repoAdapter: RepoAdapter
     private lateinit var repoRecyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var layoutNoInternet: ConstraintLayout
     private lateinit var skeletonScreen: RecyclerViewSkeletonScreen
 
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setSwipeRefreshLayout()
         setNoInternetLayout()
         setUpRecyclerView()
 
@@ -39,12 +42,21 @@ class MainActivity : AppCompatActivity() {
         attachObservers()
     }
 
+    private fun setSwipeRefreshLayout() {
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
+        swipeRefreshLayout.setOnRefreshListener {
+            skeletonScreen.show()
+            swipeRefreshLayout.isRefreshing = false
+            appViewModel.checkForEmptyDatabase = false
+            appViewModel.refreshFromApi()
+        }
+    }
+
     private fun setNoInternetLayout() {
         layoutNoInternet = findViewById(R.id.layout_no_internet)
         findViewById<Button>(R.id.button_retry).setOnClickListener {
             skeletonScreen.show()
-            repoRecyclerView.visibility = View.VISIBLE
-            layoutNoInternet.visibility = View.GONE
+            appViewModel.checkForEmptyDatabase = false
             appViewModel.refreshFromApi()
         }
     }
@@ -60,24 +72,32 @@ class MainActivity : AppCompatActivity() {
     private fun attachObservers() {
         appViewModel.repoListLiveData.observe(this) { newRepoList ->
             Log.d("repoCount", newRepoList.size.toString())
-            if (newRepoList.isEmpty()) appViewModel.refreshFromApi()
-            else {
-                repoRecyclerView.visibility = View.VISIBLE
-                layoutNoInternet.visibility = View.GONE
+            if (appViewModel.checkForEmptyDatabase && newRepoList.isEmpty()) appViewModel.refreshFromApi()
+            else if (newRepoList.isNotEmpty()) {
                 repoList.clear()
                 repoList.addAll(newRepoList)
                 if (this::repoAdapter.isInitialized) repoAdapter.notifyDataSetChanged()
-                skeletonScreen.hide()
+                displayContents()
             }
         }
 
         appViewModel.noInternetLiveData.observe(this) { noInternet ->
             if (noInternet) {
-                skeletonScreen.hide()
-                repoRecyclerView.visibility = View.GONE
-                layoutNoInternet.visibility = View.VISIBLE
+                displayNoInternet()
                 appViewModel.noInternetLiveData.value = false
             }
         }
+    }
+
+    private fun displayContents() {
+        swipeRefreshLayout.visibility = View.VISIBLE
+        layoutNoInternet.visibility = View.GONE
+        skeletonScreen.hide()
+    }
+
+    private fun displayNoInternet() {
+        swipeRefreshLayout.visibility = View.GONE
+        layoutNoInternet.visibility = View.VISIBLE
+        skeletonScreen.hide()
     }
 }
