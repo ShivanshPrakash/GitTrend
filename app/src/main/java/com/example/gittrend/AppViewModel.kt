@@ -33,8 +33,11 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
         }
     }
 
-    fun sortRepoListByStars(repoList: MutableList<Repository>) = repoList.sortedWith(compareBy { it.stars }).reversed()
+    fun sortRepoListByStars(repoList: MutableList<Repository>) {
+        repoList.sortBy { it.stars }
+        repoList.reverse()
+    }
 
     // lexicographic (or Alphabetical?)
-    fun sortRepoListByName(repoList: MutableList<Repository>) = repoList.sortedWith(compareBy { it.name })
+    fun sortRepoListByName(repoList: MutableList<Repository>) = repoList.sortBy { it.name }
 }
