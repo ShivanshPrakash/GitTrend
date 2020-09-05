@@ -132,7 +132,6 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
     private fun makeApiCall() {
         skeletonScreen.show()
-        appViewModel.checkForEmptyDatabase = false
         appViewModel.refreshFromApi()
     }
 

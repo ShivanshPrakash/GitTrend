@@ -20,7 +20,6 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
     val repoListLiveData = appRepository.getRepoListLiveData()
 
     private var pendingJob: Job? = null
-    var checkForEmptyDatabase = true
     var expandedLayoutPosition: Int? = null
 
     fun refreshFromApi() {
