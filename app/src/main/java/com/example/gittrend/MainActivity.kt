@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen
 import com.ethanhua.skeleton.Skeleton
+import com.example.gittrend.adapters.RepoAdapter
 import com.example.gittrend.database.Repository
 import dagger.hilt.android.AndroidEntryPoint
 

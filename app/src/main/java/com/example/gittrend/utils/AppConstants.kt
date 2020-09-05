@@ -1,4 +1,4 @@
-package com.example.gittrend
+package com.example.gittrend.utils
 
 /**
  * Created by Shivansh ON 05-Sep-20.

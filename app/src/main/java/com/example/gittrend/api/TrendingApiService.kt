@@ -1,4 +1,4 @@
-package com.example.gittrend
+package com.example.gittrend.api
 
 import com.example.gittrend.database.Repository
 import retrofit2.http.GET

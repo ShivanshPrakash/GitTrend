@@ -1,7 +1,9 @@
-package com.example.gittrend
+package com.example.gittrend.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.gittrend.AppRepository
+import com.example.gittrend.api.TrendingApiService
 import com.example.gittrend.database.RepoDatabase
 import com.example.gittrend.datasources.LocalDataSource
 import com.example.gittrend.datasources.RemoteDataSource

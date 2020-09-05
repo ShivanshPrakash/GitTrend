@@ -1,6 +1,6 @@
 package com.example.gittrend.datasources
 
-import com.example.gittrend.TrendingApiService
+import com.example.gittrend.api.TrendingApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

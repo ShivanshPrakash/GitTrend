@@ -1,4 +1,4 @@
-package com.example.gittrend
+package com.example.gittrend.adapters
 
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
+import com.example.gittrend.R
 import com.example.gittrend.database.Repository
 
 /**
