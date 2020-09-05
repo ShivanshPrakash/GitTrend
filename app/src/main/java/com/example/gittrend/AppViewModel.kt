@@ -8,6 +8,7 @@ import com.example.gittrend.database.Repository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
+import java.util.*
 
 /**
  * Created by Shivansh ON 03/09/20.
@@ -32,6 +33,14 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
                     noInternetLiveData.value = true
             }
         }
+    }
+
+    fun isCacheExpired(): Boolean {
+        val lastUpdateTime = appRepository.getCacheTime()
+
+        val minutesPassed =
+            ((Calendar.getInstance().time.time - lastUpdateTime) / 1000) / 60
+        return minutesPassed > CACHE_EXPIRY_DURATION
     }
 
     fun sortRepoListByStars(repoList: MutableList<Repository>) {

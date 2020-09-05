@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
             .load(R.layout.layout_skeleton).show()
 
         attachObservers()
+        if (appViewModel.isCacheExpired()) makeApiCall()
     }
 
     private fun setupMenuButton() {
@@ -61,20 +62,14 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
     private fun setSwipeRefreshLayout() {
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         swipeRefreshLayout.setOnRefreshListener {
-            skeletonScreen.show()
             swipeRefreshLayout.isRefreshing = false
-            appViewModel.checkForEmptyDatabase = false
-            appViewModel.refreshFromApi()
+            makeApiCall()
         }
     }
 
     private fun setNoInternetLayout() {
         layoutNoInternet = findViewById(R.id.layout_no_internet)
-        findViewById<Button>(R.id.button_retry).setOnClickListener {
-            skeletonScreen.show()
-            appViewModel.checkForEmptyDatabase = false
-            appViewModel.refreshFromApi()
-        }
+        findViewById<Button>(R.id.button_retry).setOnClickListener { makeApiCall() }
     }
 
     private fun setUpRecyclerView() {
@@ -88,11 +83,7 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
     private fun attachObservers() {
         appViewModel.repoListLiveData.observe(this) { newRepoList ->
             Log.d("repoCount", newRepoList.size.toString())
-            if (newRepoList.isEmpty()) {
-                menuButton.visibility = View.GONE
-                if (appViewModel.checkForEmptyDatabase) appViewModel.refreshFromApi()
-            }
-            else if (newRepoList.isNotEmpty()) {
+            if (newRepoList.isNotEmpty()) {
                 repoList.clear()
                 repoList.addAll(newRepoList)
                 if (this::repoAdapter.isInitialized) {
@@ -137,6 +128,12 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
             }
             else -> false
         }
+    }
+
+    private fun makeApiCall() {
+        skeletonScreen.show()
+        appViewModel.checkForEmptyDatabase = false
+        appViewModel.refreshFromApi()
     }
 
 
