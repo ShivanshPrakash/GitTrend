@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 
 /**
  * Created by Shivansh ON 03/09/20.
+ * Data source responsible for maintaining local database.
  */
 class LocalDataSource(private val repoDao: RepoDao) {
     fun getCartListLiveData() = repoDao.getRepoLiveData()

@@ -25,6 +25,10 @@ class AppRepository(
         localSource.addReposToDatabase(repositoryList)
     }
 
+    /**
+     * Sets the value of the shared preference
+     * [CACHE_SHARED_PREFERENCE] to current time.
+     */
     private fun setCacheTime() {
         val sharedPref = appContext.getSharedPreferences(APP_SHARED_PREFERENCE_FILE, Context.MODE_PRIVATE) ?: return
         with(sharedPref.edit()) {
@@ -33,6 +37,9 @@ class AppRepository(
         }
     }
 
+    /**
+     * @return value stored in shared preference [CACHE_SHARED_PREFERENCE]
+     */
     fun getCacheTime() = appContext
             .getSharedPreferences(APP_SHARED_PREFERENCE_FILE, Context.MODE_PRIVATE)
             .getLong(CACHE_SHARED_PREFERENCE, -1)

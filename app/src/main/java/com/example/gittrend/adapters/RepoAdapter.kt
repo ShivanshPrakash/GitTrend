@@ -20,6 +20,8 @@ import com.example.gittrend.database.Repository
 class RepoAdapter(private val repositoryList: List<Repository>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    // Denotes the adapter position of last item that was clicked
+    // and is currently in expanded state
     var expandedItemPosition: Int? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
