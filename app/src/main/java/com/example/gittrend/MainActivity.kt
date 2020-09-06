@@ -76,19 +76,23 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         repoRecyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         repoAdapter = RepoAdapter(appViewModel.repoList)
+        repoAdapter.expandedItemPosition = appViewModel.expandedLayoutPosition
         repoRecyclerView.adapter = repoAdapter
     }
 
     private fun attachObservers() {
         appViewModel.repoListLiveData.observe(this) { newRepoList ->
             Log.d("repoCount", newRepoList.size.toString())
-            if (appViewModel.isForApiCall && newRepoList.isNotEmpty()) {
-                appViewModel.isForApiCall = false
-                appViewModel.repoList.clear()
-                appViewModel.repoList.addAll(newRepoList)
-                if (this::repoAdapter.isInitialized) {
-                    appViewModel.expandedLayoutPosition?.let { repoAdapter.expandedItemPosition = it }
-                    repoAdapter.notifyDataSetChanged()
+            if (newRepoList.isNotEmpty()) {
+                if (!appViewModel.onScreenRotation) {
+                    appViewModel.onScreenRotation = true
+                    appViewModel.repoList.clear()
+                    appViewModel.repoList.addAll(newRepoList)
+                    if (this::repoAdapter.isInitialized) {
+                        appViewModel.expandedLayoutPosition = null
+                        repoAdapter.expandedItemPosition = null
+                        repoAdapter.notifyDataSetChanged()
+                    }
                 }
                 displayContents()
             }
@@ -126,7 +130,7 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
     }
 
     private fun makeApiCall() {
-        appViewModel.isForApiCall = true
+        appViewModel.onScreenRotation = false
         skeletonScreen.show()
         appViewModel.refreshFromApi()
     }

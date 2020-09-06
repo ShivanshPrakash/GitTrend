@@ -21,7 +21,7 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
     val repoListLiveData = appRepository.getRepoListLiveData()
 
     var expandedLayoutPosition: Int? = null
-    var  isForApiCall = false
+    var  onScreenRotation = false
     val repoList = mutableListOf<Repository>()
 
     private var pendingJob: Job? = null
@@ -47,19 +47,18 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
     }
 
     fun sortRepoListByStars() {
-        var expandedRepo: Repository? = null
-        expandedLayoutPosition?.let { expandedRepo = repoList[it] }
         repoList.sortBy { it.stars }
         repoList.reverse()
-        expandedRepo.let { expandedLayoutPosition = repoList.indexOf(expandedRepo) }
+        for ((index, repo) in repoList.withIndex()) {
+            if (repo.isExpanded) expandedLayoutPosition = index
+        }
     }
 
     // lexicographic (or Alphabetical?)
     fun sortRepoListByName() {
-        var expandedRepo: Repository? = null
-        expandedLayoutPosition?.let { expandedRepo = repoList[it] }
         repoList.sortBy { it.name }
-        expandedLayoutPosition = null
-        expandedRepo.let { expandedLayoutPosition = repoList.indexOf(expandedRepo) }
+        for ((index, repo) in repoList.withIndex()) {
+            if (repo.isExpanded) expandedLayoutPosition = index
+        }
     }
 }
