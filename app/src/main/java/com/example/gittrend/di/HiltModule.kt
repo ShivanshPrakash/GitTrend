@@ -24,9 +24,13 @@ object HiltModule {
 
     @Singleton
     @Provides
-    fun provideRemoteDataSource(): RemoteDataSource {
-        return RemoteDataSource(RetrofitGenerator.create(TrendingApiService::class.java) as TrendingApiService)
+    fun provideRemoteDataSource(retrofitGenerator: RetrofitGenerator): RemoteDataSource {
+        return RemoteDataSource(retrofitGenerator.create(TrendingApiService::class.java) as TrendingApiService)
     }
+
+    @Singleton
+    @Provides
+    fun provideRetrofitGenerator(): RetrofitGenerator = RetrofitGenerator()
 
     @Singleton
     @Provides

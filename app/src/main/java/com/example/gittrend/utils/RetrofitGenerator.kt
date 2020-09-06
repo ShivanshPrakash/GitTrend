@@ -9,8 +9,9 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Created by Shivansh ON 02/09/20.
+ * Utility class to setup retrofit.
  */
-object RetrofitGenerator {
+class RetrofitGenerator {
     private val interceptor = HttpLoggingInterceptor()
     private var timeout: Long = 2000
 
