@@ -20,8 +20,11 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
     val noInternetLiveData = MutableLiveData(false)
     val repoListLiveData = appRepository.getRepoListLiveData()
 
-    private var pendingJob: Job? = null
     var expandedLayoutPosition: Int? = null
+    var  isForApiCall = false
+    val repoList = mutableListOf<Repository>()
+
+    private var pendingJob: Job? = null
 
     fun refreshFromApi() {
         pendingJob?.cancel()
@@ -43,15 +46,20 @@ class AppViewModel @ViewModelInject constructor(private val appRepository: AppRe
         return minutesPassed > CACHE_EXPIRY_DURATION
     }
 
-    fun sortRepoListByStars(repoList: MutableList<Repository>) {
+    fun sortRepoListByStars() {
+        var expandedRepo: Repository? = null
+        expandedLayoutPosition?.let { expandedRepo = repoList[it] }
         repoList.sortBy { it.stars }
         repoList.reverse()
-        expandedLayoutPosition = null
+        expandedRepo.let { expandedLayoutPosition = repoList.indexOf(expandedRepo) }
     }
 
     // lexicographic (or Alphabetical?)
-    fun sortRepoListByName(repoList: MutableList<Repository>) {
+    fun sortRepoListByName() {
+        var expandedRepo: Repository? = null
+        expandedLayoutPosition?.let { expandedRepo = repoList[it] }
         repoList.sortBy { it.name }
         expandedLayoutPosition = null
+        expandedRepo.let { expandedLayoutPosition = repoList.indexOf(expandedRepo) }
     }
 }

@@ -16,14 +16,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen
 import com.ethanhua.skeleton.Skeleton
 import com.example.gittrend.adapters.RepoAdapter
-import com.example.gittrend.database.Repository
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
     private val appViewModel by viewModels<AppViewModel>()
-    private val repoList = mutableListOf<Repository>()
 
     private lateinit var menuButton: ImageButton
     private lateinit var repoAdapter: RepoAdapter
@@ -77,21 +75,19 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         repoRecyclerView = findViewById(R.id.repo_recycler_view)
         repoRecyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        repoAdapter = RepoAdapter(repoList)
+        repoAdapter = RepoAdapter(appViewModel.repoList)
         repoRecyclerView.adapter = repoAdapter
     }
 
     private fun attachObservers() {
         appViewModel.repoListLiveData.observe(this) { newRepoList ->
             Log.d("repoCount", newRepoList.size.toString())
-            if (newRepoList.isNotEmpty()) {
-                repoList.clear()
-                repoList.addAll(newRepoList)
+            if (appViewModel.isForApiCall && newRepoList.isNotEmpty()) {
+                appViewModel.isForApiCall = false
+                appViewModel.repoList.clear()
+                appViewModel.repoList.addAll(newRepoList)
                 if (this::repoAdapter.isInitialized) {
-                    appViewModel.expandedLayoutPosition?.let {
-                        repoList[it].isExpanded = true
-                        repoAdapter.expandedItemPosition = it
-                    }
+                    appViewModel.expandedLayoutPosition?.let { repoAdapter.expandedItemPosition = it }
                     repoAdapter.notifyDataSetChanged()
                 }
                 displayContents()
@@ -114,16 +110,14 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.sort_by_name -> {
-                repoAdapter.expandedItemPosition?.let { repoList[it].isExpanded = false }
-                repoAdapter.expandedItemPosition = null
-                appViewModel.sortRepoListByName(repoList)
+                appViewModel.sortRepoListByName()
+                repoAdapter.expandedItemPosition = appViewModel.expandedLayoutPosition
                 repoAdapter.notifyDataSetChanged()
                 true
             }
             R.id.sort_by_stars -> {
-                repoAdapter.expandedItemPosition?.let { repoList[it].isExpanded = false }
-                repoAdapter.expandedItemPosition = null
-                appViewModel.sortRepoListByStars(repoList)
+                appViewModel.sortRepoListByStars()
+                repoAdapter.expandedItemPosition = appViewModel.expandedLayoutPosition
                 repoAdapter.notifyDataSetChanged()
                 true
             }
@@ -132,6 +126,7 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
     }
 
     private fun makeApiCall() {
+        appViewModel.isForApiCall = true
         skeletonScreen.show()
         appViewModel.refreshFromApi()
     }
